@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot User Interface</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h2 class="title">Autonomous Navigation Robot User Interface</h2>
+    <div class="status-indicators">
+        <div class="battery-status">Battery: </div>
+        <div class="mode"></div>
+    </div>
+    {#
+        <div class="video-frame">
+            <img src="{{ url_for('video_feed') }}" alt="Waiting for camera..." class="live-feed">
+            <div class="live-badge">🔴 LIVE</div>
+        </div>
+    #}
+
+    <div class="controls">
+        <div class="autonomous-settings">
+            <button class="explore">Explore</button>
+            <button class="target-navigation">Target Navigation</button>
+            <button class="return-to-base">Return to Base</button>
+        </div>
+        <button class="manual-control">Manual Control</button>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
