@@ -3,30 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Robot User Interface</title>
+    <title>Robot Command Center</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <h2 class="title">Autonomous Navigation Robot User Interface</h2>
-    <div class="status-indicators">
-        <div class="battery-status">Battery: </div>
-        <div class="mode"></div>
-    </div>
-    {#
-        <div class="video-frame">
-            <img src="{{ url_for('video_feed') }}" alt="Waiting for camera..." class="live-feed">
-            <div class="live-badge">🔴 LIVE</div>
+    <div class="header-container">
+        <div class="project-info">
+            <h2 class="title">Autonomous Navigation Robot</h2>
+            <div class="team-members">
+                <h3>Team 2</h3>
+                <p>Kouch Mengsrun, Chan Lyda, Po Panhavorn</p>
+            </div>
         </div>
-    #}
 
-    <div class="controls">
-        <div class="autonomous-settings">
-            <button class="explore">Explore</button>
-            <button class="target-navigation">Target Navigation</button>
-            <button class="return-to-base">Return to Base</button>
+        <div class="status-indicators">
+            <div class="status-item battery-status">Battery: </div>
+            <div class="status-item mode">Mode: <span>Standby</span></div>
         </div>
-        <button class="manual-control">Manual Control</button>
     </div>
+
+    <div class="main-layout">
+        
+        <div class="video-frame" id="videoContainer">
+            <img id="robotStream" src="" alt="Robot Feed" class="live-feed" 
+                 onload="handleSuccess()" onerror="handleError()">
+            
+            <div class="video-placeholder" id="placeholder">
+                <div id="loadingIndicator" class="loading-spinner"></div>
+                <div class="icon" id="errorIcon" style="display:none;">⚠️</div>
+                <p id="statusText">Connecting to Robot...</p>
+                <button id="retryBtn" class="connect-btn" onclick="attemptConnection()" style="display:none;">
+                    Reconnect to Camera
+                </button>
+            </div>
+            
+            <div class="live-badge" id="liveBadge" style="display: none;">🔴 LIVE</div>
+        </div>
+
+        <div class="controls-sidebar">
+            <div class="sidebar-label">Autonomous Missions</div>
+            <div class="autonomous-settings">
+                <button class="btn-primary explore">Explore Area</button>
+                <button class="btn-primary target-navigation">Target Navigation</button>
+                <button class="btn-primary return-to-base">Return to Base</button>
+            </div>
+            
+            <div class="sidebar-label">Disable Autonomous Functions</div>
+            <button class="manual-control">Manual Control</button>
+        </div>
+    </div>
+
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
