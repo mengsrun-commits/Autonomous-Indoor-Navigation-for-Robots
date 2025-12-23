@@ -11,7 +11,7 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 
 arduino = None
 try:
-    # Same logic as your original script
+    # Find Arduino port
     arduino_ports = glob.glob('/dev/serial/by-id/*Arduino*')
     if arduino_ports:
         arduino_port = arduino_ports[0]
