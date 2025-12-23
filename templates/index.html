@@ -27,7 +27,8 @@
         <div class="video-frame" id="videoContainer">
             <img id="robotStream" src="" alt="Robot Feed" class="live-feed" 
                  onload="handleSuccess()" onerror="handleError()">
-            
+            <div id="battery-indicator" class="battery-overlay">
+            </div>
             <div class="video-placeholder" id="placeholder">
                 <div id="loadingIndicator" class="loading-spinner"></div>
                 <div class="icon" id="errorIcon" style="display:none;">⚠️</div>
@@ -41,18 +42,36 @@
         </div>
 
         <div class="controls-sidebar">
-            <div class="sidebar-label">Autonomous Missions</div>
-            <div class="autonomous-settings">
-                <button class="btn-primary explore">Explore Area</button>
-                <button class="btn-primary target-navigation">Target Navigation</button>
-                <button class="btn-primary return-to-base">Return to Base</button>
+            <div class="mode-stack">
+                
+                <div id="auto-panel">
+                    <div class="sidebar-label">Autonomous Missions</div>
+                    <div class="autonomous-settings">
+                        <button class="btn-primary explore">Explore Area</button>
+                        <button class="btn-primary target-navigation">Target Navigation</button>
+                        <button class="btn-primary return-to-base">Return to Base</button>
+                    </div>
+                </div>
+                
+                <div class="sidebar-label">Disable Autonomous Functions</div>
+                <div id="manual-instructions" class="instruction-overlay">
+                    <p>Control with your keyboard</p>
+                    <div class="d-pad-container">
+                        <button id="left-arrow" class="d-btn">&#8592;</button>
+                        <div class="forward-backward-buttons">
+                            <button id="up-arrow" class="d-btn">&#8593;</button>
+                            <button id="down-arrow" class="d-btn">&#8595;</button>
+                        </div>
+                        <button id="right-arrow" class="d-btn">&#8594;</button>
+                    </div>
+                </div>
+                
             </div>
-            
-            <div class="sidebar-label">Disable Autonomous Functions</div>
+
             <button class="manual-control">Manual Control</button>
         </div>
     </div>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

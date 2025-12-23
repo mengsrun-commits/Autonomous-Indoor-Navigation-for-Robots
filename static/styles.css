@@ -1,4 +1,6 @@
-/* --- Root Variables & Reset --- */
+/* =========================================
+   1. ROOT VARIABLES & RESET
+   ========================================= */
 :root {
     --bg-color: #0f172a;
     --card-bg: #1e293b;
@@ -25,15 +27,16 @@ body {
     min-height: 100vh;
 }
 
-/* --- Header Styling --- */
+/* =========================================
+   2. HEADER STYLING
+   ========================================= */
 .header-container {
     width: 100%;
     max-width: 1200px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
-    margin-top: 10px;
+    margin: 10px 0 25px 0;
     padding-bottom: 15px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
@@ -44,41 +47,84 @@ body {
     margin: 0;
     text-transform: uppercase;
     font-size: 1.6rem;
-    color: var(--text-primary);
 }
 
 .team-members h3 { margin: 5px 0 0 0; font-size: 0.85rem; color: var(--accent-blue); opacity: 0.9; }
 .team-members p { margin: 2px 0 0 0; font-size: 0.75rem; color: var(--text-secondary); }
 
-.status-indicators {
-    display: flex;
-    gap: 15px;
+/* --- Update .status-indicators in Header --- */
+.status-indicators { 
+    display: flex; 
+    gap: 20px; 
 }
 
 .status-item {
-    background: var(--card-bg);
-    padding: 8px 16px;
-    border-radius: 50px;
-    font-size: 0.85rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    /* Make them look like cards */
+    display: flex;
+    flex-direction: column; /* Stack label and value */
+    align-items: center;
+    justify-content: center;
+    
+    min-width: 120px;
+    padding: 10px 20px;
+    border-radius: 12px;
+    
+    /* Typography */
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 600;
+    
+    /* Remove old borders/backgrounds */
+    border: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    transition: transform 0.2s ease;
 }
 
-.battery-status::after { content: ' 85%'; color: var(--accent-green); font-weight: bold; }
-.mode span { color: var(--accent-blue); font-weight: bold; }
+/* Specific Styling for Battery */
+.battery-status {
+    background: linear-gradient(135deg, rgba(74, 222, 128, 0.2), rgba(74, 222, 128, 0.1));
+    border: 1px solid rgba(74, 222, 128, 0.3);
+}
 
-/* --- Main Layout: Side by Side --- */
+/* Make the value (e.g. "85%") huge and green */
+.battery-status::after {
+    content: '85%'; /* You might want to move this to JS eventually */
+    color: #01ff34;
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-top: 2px;
+}
+
+/* Specific Styling for Mode */
+.mode {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(56, 189, 248, 0.1));
+    border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.mode span {
+    color: var(--accent-blue);
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-top: 2px;
+}
+
+/* =========================================
+   3. MAIN LAYOUT (Video + Sidebar)
+   ========================================= */
 .main-layout {
     width: 100%;
     max-width: 1200px;
     display: flex;
-    flex-direction: row; /* Horizontal */
+    flex-direction: row;
     gap: 25px;
-    align-items: flex-start;
+    align-items: center; 
 }
 
-/* --- Left Side: Video (Flexible) --- */
+/* --- Left: Video Frame --- */
 .video-frame {
-    flex: 3; /* Takes 75% of space */
+    flex: 3;
     position: relative;
     aspect-ratio: 16 / 9;
     background: #020617;
@@ -91,6 +137,19 @@ body {
     justify-content: center;
 }
 
+.battery-overlay {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    
+    width: 32px;  /* Icon size */
+    height: 32px;
+    
+    /* Ensure visibility on light/dark backgrounds */
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.8)); 
+    z-index: 10;
+}
+
 .live-feed {
     display: none;
     width: 100%;
@@ -98,24 +157,67 @@ body {
     object-fit: cover;
 }
 
-/* --- Right Side: Sidebar (Fixed Min-width) --- */
+/* --- Right: Sidebar Container --- */
 .controls-sidebar {
-    flex: 1; /* Takes 25% of space */
+    flex: 1;
     min-width: 280px;
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
+/* =========================================
+   4. SIDEBAR - AUTONOMOUS PANEL
+   ========================================= */
+.mode-stack {
+    display: grid;
+    /* Stack items in the same cell */
+    grid-template-areas: "stack"; 
+    /* FIXED HEIGHT: Ensures button below never moves up or down */
+    height: 320px; 
+    width: 100%;
+    align-items: center; /* Centers content inside the fixed box */
+}
+
+#auto-panel, 
+.instruction-overlay {
+    grid-area: stack; /* Both sit in the same spot */
+    width: 100%;
+    transition: all 0.4s ease;
+}
+
+#auto-panel {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+}
+
+.controls-sidebar.manual-active #auto-panel {
+    opacity: 0;
+    transform: scale(0.95);
+    pointer-events: none;
+}
+
+.controls-sidebar.manual-active .sidebar-label {
+    opacity: 0;
+}
+
 .sidebar-label {
+    transition: all 0.4s ease;
+    opacity: 1;
     font-size: 0.7rem;
     font-weight: 700;
     text-transform: uppercase;
     color: var(--text-secondary);
-    letter-spacing: 1px;
-    margin-top: 10px;
+    letter-spacing: 1px;    
+    margin-top: 20px;
     margin-left: 5px;
 }
+
+#auto-panel .sidebar-label { 
+    margin-bottom: 20px;
+}
+
 
 .autonomous-settings {
     display: flex;
@@ -138,12 +240,13 @@ body {
     transition: var(--transition);
     font-size: 0.9rem;
 }
+.btn-primary:hover { background: #7dd3fc; transform: translateX(5px); }
 
-.btn-primary:hover {
-    background: #7dd3fc;
-    transform: translateX(5px);
-}
+/* =========================================
+   5. SIDEBAR - MANUAL CONTROLS
+   ========================================= */
 
+/* --- A. Manual Toggle Button (PINNED TO BOTTOM) --- */
 .manual-control {
     width: 100%;
     background: transparent;
@@ -151,11 +254,10 @@ body {
     color: var(--text-secondary);
     padding: 15px;
     border-radius: 12px;
-    margin-top: 15px;
     cursor: pointer;
     font-weight: 600;
     text-transform: uppercase;
-    transition: var(--transition);
+    transition: all 0.3s ease;
 }
 
 .manual-control:hover {
@@ -165,7 +267,72 @@ body {
     transform: scale(1.02);
 }
 
-/* --- Video Overlay UI --- */
+/* Active State (Red Stop Button) */
+.controls-sidebar.manual-active .manual-control {
+    background-color: var(--accent-red);
+    color: #fff;
+    border-color: var(--accent-red);
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+}
+
+/* --- B. Instruction Overlay (D-Pad) --- */
+.instruction-overlay {
+    /* Internal Flex Layout */
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+
+    /* Hidden State */
+    opacity: 0;
+    transform: scale(0.95);
+    pointer-events: none;
+}
+
+.controls-sidebar.manual-active .instruction-overlay {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+}
+
+.instruction-overlay p {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin: 0;
+}
+
+/* --- C. D-Pad Buttons --- */
+.d-pad-container { display: flex; align-items: center; gap: 10px; }
+.forward-backward-buttons { display: flex; flex-direction: column; gap: 10px; }
+
+.d-btn {
+    width: 50px;
+    height: 50px;
+    background-color: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+}
+
+.d-btn:active, .d-btn.active {
+    transform: translateY(4px);
+    box-shadow: none;
+    background-color: var(--accent-blue);
+    border-color: var(--accent-blue);
+}
+
+/* =========================================
+   6. VIDEO OVERLAY UI
+   ========================================= */
 .video-placeholder {
     display: flex;
     flex-direction: column;
@@ -202,11 +369,12 @@ body {
     animation: pulse 2s infinite;
 }
 
-/* --- Animations --- */
+/* =========================================
+   7. ANIMATIONS & RESPONSIVE
+   ========================================= */
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 
-/* --- Responsive Layout --- */
 @media (max-width: 950px) {
     .main-layout { flex-direction: column; }
     .video-frame { width: 100%; flex: none; }

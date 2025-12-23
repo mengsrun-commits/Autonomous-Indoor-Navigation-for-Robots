@@ -4,3 +4,5 @@ opencv-contrib-python
 numpy
 tensorflow
 tensorflow-hub
+pyserial
+flask-socketio
