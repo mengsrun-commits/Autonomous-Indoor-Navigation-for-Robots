@@ -6,6 +6,8 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
+fdjskafjdksl;ajk
+
 def gen_frames():
     # Placeholder for camera logic
     # If camera fails: raise Exception("Camera not found")
