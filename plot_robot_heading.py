@@ -2,52 +2,61 @@ import serial
 import matplotlib.pyplot as plt
 import numpy as np
 import time
+import glob
 
 # ===== Serial setup =====
-SERIAL_PORT = 'COM6'  # Change to your port
-BAUD_RATE = 115200
+BAUD_RATE = 115200   # <-- MUST match Serial.begin() in Arduino
 
-ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
-time.sleep(2)  # wait for Arduino
+ports = glob.glob("/dev/serial/by-id/*Arduino*")
+if not ports:
+    raise RuntimeError("Arduino not found")
+
+arduino_port = ports[0]
+print(f"Connecting to {arduino_port} ...")
+
+ser = serial.Serial(arduino_port, BAUD_RATE, timeout=1)
+time.sleep(2)
+print("Connected.\nStarting plot...")
 
 # ===== Plot setup =====
 plt.ion()
 fig, ax = plt.subplots()
 ax.set_xlim(-1, 1)
 ax.set_ylim(-1, 1)
-ax.set_aspect('equal')
+ax.set_aspect("equal")
 ax.set_title("Robot Heading")
 
-current_arrow = None
+line, = ax.plot([0, 0], [0, 0])
+plt.show(block=False)
+plt.pause(0.1)
+
 theta = 0.0
-dt = 0.1  # Arduino integration interval in seconds
+t_prev = time.time()
 
 try:
     while True:
-        line = ser.readline().decode('utf-8').strip()
-        if not line:
+        line_raw = ser.readline().decode("utf-8", errors="ignore").strip()
+        if not line_raw:
             continue
+
         try:
-            gz_rad = float(line)  # read gyroZ in rad/s
-        except:
+            gz = float(line_raw)   # rad/s from Arduino
+        except ValueError:
             continue
 
-        # integrate to get heading
-        theta += gz_rad * dt
-        theta = theta % (2 * np.pi)
+        t_now = time.time()
+        dt = t_now - t_prev
+        t_prev = t_now
 
-        # remove previous arrow
-        if current_arrow:
-            current_arrow.remove()
+        theta = (theta + gz * dt) % (2*np.pi)
 
-        # compute arrow components
         dx = 0.5 * np.cos(theta)
         dy = 0.5 * np.sin(theta)
-        current_arrow = ax.arrow(0, 0, dx, dy, head_width=0.05, head_length=0.1, fc='r', ec='r')
 
+        line.set_data([0, dx], [0, dy])
         plt.pause(0.01)
 
 except KeyboardInterrupt:
-    print("Stopping...")
+    print("\nStopping...")
     ser.close()
     plt.show()
