@@ -1,9 +1,12 @@
 import cv2  
-from flask import Flask, render_template, Response, request, jsonify
+from flask import Flask, render_template, Response, request
 import serial
 import glob
 import time
+import threading
+import numpy as np
 from flask_socketio import SocketIO
+from stable_baselines3 import PPO
 
 app = Flask(__name__)
 # Initialize SocketIO. "cors_allowed_origins" allows connection from any browser.
@@ -66,8 +69,39 @@ def video_feed():
         print(f"Camera Error: {e}")
         return "Camera connection failed", 503
 
+@socketio.on('enable_exploration')
+def handle_explore():
+    global autonomous_active, model
+    
+    # 1. Load Model (Only if not loaded yet)
+    if model is None:
+        try:
+            print("Loading PPO Model...")
+            # Tell Frontend: "I am loading now"
+            socketio.emit('ai_status', {'status': 'loading'}) 
+            
+            model = PPO.load("ppo_2d_robot", device="cpu")
+            print("Model Loaded!")
+        except Exception as e:
+            print(f"Error: {e}")
+            return
+
+    # 2. Activate Logic
+    autonomous_active = True
+    
+    # 3. Tell Frontend: "Ready to start"
+    socketio.emit('ai_status', {'status': 'ready'})
+    print("Autonomous Mode ACTIVE")
+
+@socketio.on('disable_autonomous')
+def disable_explore_area():
+    global autonomous_active
+    autonomous_active = False
+    if arduino: arduino.write(b'X') # Force Stop
+    print("Autonomous Mode DISABLED")
+
 @socketio.on('stop_manual_control')
-def handle_emergency_stop():
+def disable_manual_control():
     print("Stop Manual Control!")
     if arduino:
         # 1. Clear any 'Up/Down' commands waiting in the queue
@@ -106,5 +140,4 @@ def handle_control(data):
             print(f"Serial write failed: {e}")
 
 if __name__ == '__main__':
-    # CRITICAL CHANGE: Use socketio.run instead of app.run
     socketio.run(app, host='0.0.0.0', debug=True, allow_unsafe_werkzeug=True)
